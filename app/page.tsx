@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Globe } from "@/components/magicui/globe";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Code2, Cpu, Database, FileJson, Globe2, Layout, Mail, Github, Linkedin, Moon, Sun, Home as HomeIcon, FolderGit2 } from 'lucide-react';
+import { Code2, Mail, Github, Linkedin, Moon, Sun, Home as HomeIcon, FolderGit2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { TechMarquee } from '@/components/ui/tech-marquee';
+import Ability from '@/components/ui/skills';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { BorderBeam } from "@/components/magicui/border-beam";
@@ -26,61 +27,8 @@ export default function Home() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['hero', 'technologies', 'projects', 'contact'];
-      
-      // Verificar se estamos no topo da página
-      if (window.scrollY < 100) {
-        setActiveSection('hero');
-        return;
-      }
-
-      // Verificar se estamos próximos do final da página
-      const isNearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
-      if (isNearBottom) {
-        setActiveSection('contact');
-        return;
-      }
-
-      // Para as seções intermediárias, usar uma lógica mais precisa
-      const current = sections.find((section) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const elementHeight = rect.height;
-          const elementMiddle = rect.top + elementHeight / 2;
-          
-          // Considerar uma seção ativa quando seu ponto médio está próximo do centro da viewport
-          return Math.abs(elementMiddle - window.innerHeight / 2) < elementHeight / 2;
-        }
-        return false;
-      });
-      
-      if (current) {
-        setActiveSection(current);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Chamar imediatamente para definir a seção inicial
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const technologies = [
-    { icon: <Code2 className="w-8 h-8" />, name: 'JavaScript' },
-    { icon: <Layout className="w-8 h-8" />, name: 'React' },
-    { icon: <Globe2 className="w-8 h-8" />, name: 'Next.js' },
-    { icon: <FileJson className="w-8 h-8" />, name: 'TypeScript' },
-    { icon: <Cpu className="w-8 h-8" />, name: 'Python' },
-    { icon: <Database className="w-8 h-8" />, name: 'SQL' },
-  ];
-
-  const projects = [
+  // Memoize projects data
+  const projects = useMemo(() => [
     {
       title: 'Ensina+',
       description: 'Ensina+ is a digital educational platform developed for students of the SESI-SP network',
@@ -92,35 +40,36 @@ export default function Home() {
     {
       title: 'Next Store',
       description: 'Computer peripherals e-commerce',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c',
+      image: '/project2.png',
       tech: ['React', 'Next.js', 'Prisma', 'Tailwind CSS'],
-      demo: '#',
+      demo: 'https://next-store-virid.vercel.app/',
       repo: 'https://github.com/GabrielSakoda/next-store',
     },
     {
-      title: 'Project Three',
-      description: 'Data visualization dashboard',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71',
-      tech: ['D3.js', 'React', 'Python'],
-      demo: '#',
-      repo: '#',
+      title: 'Hermann',
+      description: 'Luxury car dealership website',
+      image: '/project3.png',
+      tech: ['JavaScript', 'Tailwind CSS'],
+      demo: 'https://projeto-hermann-i7fh7dxc3-gabriel-sakodas-projects.vercel.app/',
+      repo: 'https://github.com/GabrielSakoda/Projeto---Hermann',
     },
-  ];
+  ], []);
 
-  const contacts = [
+  // Memoize contacts data
+  const contacts = useMemo(() => [
     { 
       icon: <Mail className="w-8 h-8" />, 
       label: 'Email',
       title: "Let's talk",
       description: "Send me an email",
-      href: 'mailto:your.email@example.com' 
+      href: 'mailto:otanigabriel0@gmail.com?subject=Contact from Portfolio&body=Hi Gabriel,' 
     },
     { 
       icon: <Github className="w-8 h-8" />, 
       label: 'GitHub',
       title: "Check my code",
       description: "See my open source projects",
-      href: 'https://github.com/yourusername' 
+      href: 'https://github.com/GabrielSakoda' 
     },
     { 
       icon: <Linkedin className="w-8 h-8" />, 
@@ -129,64 +78,86 @@ export default function Home() {
       description: "Follow my professional journey",
       href: 'https://www.linkedin.com/in/gabriel-otani-sakoda-44018a28b/' 
     },
-  ];
+  ], []);
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0 },
-    hover: {
-      scale: 1.05,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const imageVariants = {
-    hover: {
-      scale: 1.1,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const techBadgeVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1 },
-    hover: {
-      y: -5,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const contactCardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-    hover: {
-      y: -10,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const NAV_ITEMS = [
+  // Memoize NAV_ITEMS
+  const NAV_ITEMS = useMemo(() => [
     { id: 'hero', label: 'Home', icon: HomeIcon },
     { id: 'technologies', label: 'Tech', icon: Code2 },
     { id: 'projects', label: 'Projects', icon: FolderGit2 },
     { id: 'contact', label: 'Contact', icon: Mail },
-  ];
+  ], []);
 
-  if (!mounted) {
-    return null;
-  }
+  // Optimize scroll handler with useCallback
+  const handleScroll = useCallback(() => {
+    const sections = ['hero', 'technologies', 'projects', 'contact'];
+    
+    if (window.scrollY < 100) {
+      setActiveSection('hero');
+      return;
+    }
+
+    const isNearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+    if (isNearBottom) {
+      setActiveSection('contact');
+      return;
+    }
+
+    const current = sections.find((section) => {
+      const element = document.getElementById(section);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const elementHeight = rect.height;
+        const elementMiddle = rect.top + elementHeight / 2;
+        return Math.abs(elementMiddle - window.innerHeight / 2) < elementHeight / 2;
+      }
+      return false;
+    });
+    
+    if (current) {
+      setActiveSection(current);
+    }
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Optimize theme toggle handler
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
+
+  // Optimize scroll to section handler
+  const scrollToSection = useCallback((id: string) => {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, []);
+
+  // Add email handler
+  const handleEmailClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const email = 'otanigabriel0@gmail.com';
+    const subject = 'Contact from Portfolio';
+    const body = 'Hi Gabriel,';
+    
+    // Try to open mail client
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Fallback for mobile devices
+    setTimeout(() => {
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+    }, 300);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <main className={`min-h-screen ${theme === 'dark' ? 'bg-black' : 'bg-gray-50'} text-foreground overflow-hidden`}>
@@ -205,22 +176,35 @@ export default function Home() {
             <StatusBadge />
           </motion.div>
 
-          <div className="flex items-center justify-between gap-8 mt-12">
-            <div className="flex-1">
+          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 mt-12">
+            <div className="flex-1 text-center md:text-left">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className={`text-5xl font-bold leading-tight ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
+                className={`text-4xl md:text-5xl font-bold leading-tight ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
               >
-                Hi, I'm Gabriel Sakoda 👋
+                Hi, I'm Gabriel Sakoda <motion.span
+                  animate={{
+                    rotate: [0, 14, -8, 14, -4, 10, 0],
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut",
+                  }}
+                  style={{ display: "inline-block", originX: 0.7, originY: 0.7 }}
+                >
+                  👋
+                </motion.span>
               </motion.h1>
 
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className={`text-2xl mt-4 ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-700'}`}
+                className={`text-xl md:text-2xl mt-4 ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-700'}`}
               >
                 <AuroraText>Full-stack Developer</AuroraText>
               </motion.h2>
@@ -229,7 +213,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className={`mt-8 text-xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} max-w-2xl`}
+                className={`mt-6 md:mt-8 text-lg md:text-xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} max-w-2xl mx-auto md:mx-0`}
               >
                 I'm a passionate developer dedicated to crafting effective solutions and intuitive interfaces.
               </motion.p>
@@ -239,10 +223,15 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex-shrink-0 -mt-8"
+              className="flex-shrink-0 -mt-0 md:-mt-8"
             >
-              <Avatar className={`w-48 h-48 rounded-full${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
-                <AvatarImage src="https://github.com/gabrielsakoda.png" alt="Gabriel Sakoda" />
+              <Avatar className={`w-32 h-32 md:w-48 md:h-48 rounded-full border-4 ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                <AvatarImage 
+                  src="https://github.com/gabrielsakoda.png" 
+                  alt="Gabriel Sakoda"
+                  loading="eager"
+                  fetchPriority="high"
+                />
                 <AvatarFallback>GS</AvatarFallback>
               </Avatar>
             </motion.div>
@@ -250,37 +239,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Technologies Section */}
-      <section id="technologies" className={`py-10 ${theme === 'dark' ? 'bg-black/80' : 'bg-gray-100/80'} backdrop-blur-sm`}>
+      {/* Skills Section */}
+      <section id="technologies" className="py-8 md:py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="container mx-auto"
+          className="container mx-auto px-4"
         >
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className={`text-4xl font-bold text-center mb-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+            className={`text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
           >
             Skills
           </motion.h2>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <TechMarquee />
+            <Ability />
           </motion.div>
         </motion.div>
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-20 px-4 md:px-8">
+      <section id="projects" className="py-12 md:py-20 px-4 md:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -293,7 +282,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className={`text-4xl font-bold text-center mb-12 ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
+            className={`text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
           >
             Projects
           </motion.h2>
@@ -302,7 +291,7 @@ export default function Home() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto"
           >
             {projects.map((project, index) => (
               <motion.div
@@ -311,7 +300,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="relative group h-[500px]"
+                className="relative group h-[450px] md:h-[500px]"
               >
                 <div
                   className={`${theme === 'dark' ? 'bg-card/30' : 'bg-white'} shadow-lg backdrop-blur-sm overflow-hidden rounded-xl h-full flex flex-col`}
@@ -319,31 +308,30 @@ export default function Home() {
                   <BorderBeam size={100} duration={8} delay={3} />
                   <BorderBeam duration={8} size={100} />
                   <motion.div
-                    variants={cardVariants}
                     initial="hidden"
                     whileInView="visible"
-                    whileHover="hover"
+                    whileHover={{ scale: 1.02 }}
                     viewport={{ once: true }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.2,
-                    }}
+                    transition={{ duration: 0.3 }}
                     className="flex flex-col h-full"
                   >
-                    <motion.div className="overflow-hidden h-48">
-                      <motion.img
-                        variants={imageVariants}
+                    <div className="overflow-hidden h-40 md:h-48 relative">
+                      <Image
                         src={project.image}
                         alt={project.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading={index <= 1 ? "eager" : "lazy"}
+                        quality={85}
                       />
-                    </motion.div>
-                    <div className="p-6 flex flex-col flex-grow">
+                    </div>
+                    <div className="p-4 md:p-6 flex flex-col flex-grow">
                       <motion.h3
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
+                        className={`text-lg md:text-xl font-bold mb-2 ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}
                       >
                         {project.title}
                       </motion.h3>
@@ -351,7 +339,7 @@ export default function Home() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className={`mb-4 line-clamp-3 ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-700'}`}
+                        className={`mb-4 text-sm md:text-base line-clamp-3 ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-700'}`}
                       >
                         {project.description}
                       </motion.p>
@@ -359,12 +347,11 @@ export default function Home() {
                         {project.tech.map((tech, techIndex) => (
                           <motion.span
                             key={techIndex}
-                            variants={techBadgeVariants}
-                            initial="hidden"
-                            animate="visible"
-                            whileHover="hover"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            whileHover={{ y: -2 }}
                             transition={{ delay: 0.4 + techIndex * 0.1 }}
-                            className={`px-3 py-1 rounded-full text-sm ${
+                            className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm ${
                               theme === 'dark' ? 'bg-secondary/50 text-foreground backdrop-blur-sm' : 'bg-gray-100 text-gray-800 backdrop-blur-sm'
                             }`}
                           >
@@ -372,16 +359,13 @@ export default function Home() {
                           </motion.span>
                         ))}
                       </div>
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="flex space-x-4 mt-auto"
-                      >
+                      <div className="flex space-x-4 mt-auto">
                         <motion.a
                           whileHover={{ scale: 1.05 }}
                           href={project.demo}
-                          className={`transition-colors ${
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`text-sm md:text-base transition-colors ${
                             theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
                           }`}
                         >
@@ -390,13 +374,15 @@ export default function Home() {
                         <motion.a
                           whileHover={{ scale: 1.05 }}
                           href={project.repo}
-                          className={`transition-colors ${
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`text-sm md:text-base transition-colors ${
                             theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
                           }`}
                         >
                           Repository
                         </motion.a>
-                      </motion.div>
+                      </div>
                     </div>
                   </motion.div>
                 </div>
@@ -407,7 +393,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className={`py-20 px-4 md:px-8 ${theme === 'dark' ? 'bg-black/80' : 'bg-gray-100/80'} backdrop-blur-sm`}>
+      <section id="contact" className="py-12 md:py-20 px-4 md:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -420,7 +406,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className={`text-4xl font-bold text-center mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+            className={`text-3xl md:text-4xl font-bold text-center mb-3 md:mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
           >
             Get in Touch
           </motion.h2>
@@ -429,7 +415,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className={`text-center mb-12 max-w-2xl mx-auto ${theme === 'dark' ? 'text-white/80' : 'text-gray-700'}`}
+            className={`text-center mb-8 md:mb-12 max-w-2xl mx-auto text-sm md:text-base ${theme === 'dark' ? 'text-white/80' : 'text-gray-700'}`}
           >
             I'm always open to new opportunities and collaborations. Feel free to reach out through any of these channels.
           </motion.p>
@@ -438,20 +424,21 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8"
           >
             {contacts.map((contact, index) => (
               <motion.a
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                whileHover="hover"
+                whileHover={{ y: -5 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 className={`${
                   theme === 'dark' ? 'bg-card hover:bg-card/80' : 'bg-white hover:bg-white/90'
-                } p-6 rounded-lg text-center transition-all backdrop-blur-sm relative overflow-hidden shadow-lg`}
+                } p-4 md:p-6 rounded-lg text-center transition-all backdrop-blur-sm relative overflow-hidden shadow-lg`}
                 href={contact.href}
+                onClick={contact.label === 'Email' ? handleEmailClick : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -462,7 +449,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
-                  className={`inline-block p-3 rounded-full ${theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'} mb-4`}
+                  className={`inline-block p-2 md:p-3 rounded-full ${theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'} mb-3 md:mb-4`}
                 >
                   {contact.icon}
                 </motion.div>
@@ -471,7 +458,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
-                  className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                  className={`text-lg md:text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                 >
                   {contact.title}
                 </motion.h3>
@@ -480,7 +467,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.2 + 0.4 }}
-                  className={theme === 'dark' ? 'text-white/80' : 'text-gray-700'}
+                  className={`text-sm md:text-base ${theme === 'dark' ? 'text-white/80' : 'text-gray-700'}`}
                 >
                   {contact.description}
                 </motion.p>
@@ -491,29 +478,25 @@ export default function Home() {
       </section>
 
       {/* Navigation Bar */}
-      <div className="fixed bottom-8 left-0 right-0 z-50 flex justify-center">
+      <div className="fixed bottom-4 left-0 inset-x-0 right-0 mx-auto z-30 flex justify-center">
         <TooltipProvider>
-          <Dock className={theme === 'dark' ? 'bg-black/20' : 'bg-white/70 shadow-lg'}>
+          <Dock className={`${theme === 'dark' ? 'bg-black/20' : 'bg-white/70'} shadow-lg scale-90 md:scale-100`}>
             {NAV_ITEMS.map((item) => (
               <DockIcon key={item.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      onClick={() => {
-                        document.getElementById(item.id)?.scrollIntoView({
-                          behavior: 'smooth',
-                        });
-                      }}
+                      onClick={() => scrollToSection(item.id)}
                       className={cn(
                         buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full",
+                        "size-4 rounded-full",
                         theme === 'dark' 
                           ? (activeSection === item.id ? "text-white bg-white/10" : "text-white/70 hover:text-white hover:bg-white/10")
                           : (activeSection === item.id ? "text-gray-900 bg-gray-100" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100")
                       )}
                       aria-label={item.label}
                     >
-                      <item.icon className="size-5" />
+                      <item.icon className="size-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className={theme === 'dark' ? 'bg-black/80 text-white' : 'bg-white text-gray-900 shadow-lg'}>
@@ -527,7 +510,7 @@ export default function Home() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    onClick={toggleTheme}
                     className={cn(
                       buttonVariants({ variant: "ghost", size: "icon" }),
                       "size-12 rounded-full",
@@ -537,7 +520,7 @@ export default function Home() {
                     )}
                     aria-label="Toggle theme"
                   >
-                    {theme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
+                    {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className={theme === 'dark' ? 'bg-black/80 text-white' : 'bg-white text-gray-900 shadow-lg'}>
